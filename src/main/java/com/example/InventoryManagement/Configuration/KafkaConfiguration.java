@@ -1,5 +1,7 @@
 package com.example.InventoryManagement.Configuration;
 
+import com.example.InventoryManagement.DTO.ProductActionDto;
+import com.fasterxml.jackson.databind.JsonSerializer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -20,29 +22,29 @@ import java.util.Map;
 public class KafkaConfiguration {
 
     @Bean
-    DefaultKafkaProducerFactory<String, String> stringProducerFactory(KafkaProperties properties) {
+    DefaultKafkaProducerFactory<String, ProductActionDto> stringProducerFactory(KafkaProperties properties) {
         Map<String, Object> producerProperties = properties.buildProducerProperties(null);
         producerProperties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        producerProperties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        producerProperties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
         return new DefaultKafkaProducerFactory<>(producerProperties);
     }
 
     @Bean
-    KafkaTemplate<String, String> stringKafkaTemplate(DefaultKafkaProducerFactory<String, String> stringProducerFactory) {
+    KafkaTemplate<String, ProductActionDto> stringKafkaTemplate(DefaultKafkaProducerFactory<String, ProductActionDto> stringProducerFactory) {
         return new KafkaTemplate<>(stringProducerFactory);
     }
 
     @Bean
-    public ConsumerFactory<String, String> stringConsumerFactory(KafkaProperties kafkaProperties) {
+    public ConsumerFactory<String, ProductActionDto> stringConsumerFactory(KafkaProperties kafkaProperties) {
         Map<String, Object> props = kafkaProperties.buildConsumerProperties(null);
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonSerializer.class);
         return new DefaultKafkaConsumerFactory<>(props);
     }
 
     @Bean
-    public KafkaListenerContainerFactory<?> stringListenerFactory(ConsumerFactory<String, String> stringConsumerFactory) {
-        ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
+    public KafkaListenerContainerFactory<?> stringListenerFactory(ConsumerFactory<String, ProductActionDto> stringConsumerFactory) {
+        ConcurrentKafkaListenerContainerFactory<String, ProductActionDto> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(stringConsumerFactory);
         factory.setBatchListener(false);
         return factory;

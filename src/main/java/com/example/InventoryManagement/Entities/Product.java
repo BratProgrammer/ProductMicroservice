@@ -7,8 +7,8 @@ import org.hibernate.proxy.HibernateProxy;
 
 import java.util.Objects;
 
-@Table(name = "products")
 @Entity
+@Table(name = "products")
 @Getter
 @Setter
 @ToString
@@ -18,9 +18,6 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "id", nullable = false)
     private Long id;
-
-    @Min(0)
-    private int quantity;
 
     @Min(0)
     private int cost;

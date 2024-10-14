@@ -57,14 +57,14 @@ public class ProductController {
         return productMapper.toDto(productService.save(productMapper.toEntity(productDto)));
     }
 
-    @PutMapping(path = {"/{id}"})
+    @PatchMapping(path = {"/{id}"})
     public Product patch(@PathVariable Long id, @RequestBody JsonNode patchNode) throws IOException {
         Product product = productService.findById(id).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Entity with id `%s` not found".formatted(id)));
 
         objectMapper.readerForUpdating(product).readValue(patchNode);
 
-        return productService.save(product);
+        return productService.patch(product);
     }
 
     @PatchMapping

@@ -1,4 +1,4 @@
-package com.example.InventoryManagement.DTO;
+package com.example.InventoryManagement.DTO.Api;
 
 import com.example.InventoryManagement.Entities.Product;
 import jakarta.validation.constraints.Min;
@@ -12,8 +12,6 @@ import java.io.Serializable;
 @Value
 public class ProductDto implements Serializable {
     Long id;
-    @Min(0)
-    int quantity;
     @Min(0)
     int cost;
     String description;
