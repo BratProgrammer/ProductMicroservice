@@ -1,6 +1,7 @@
 package com.example.InventoryManagement.Services;
 
 import com.example.InventoryManagement.DTO.Kafka.ProductActionDto;
+import com.example.InventoryManagement.DTO.Kafka.ProductsActionDto;
 import com.example.InventoryManagement.Entities.Product;
 import com.example.InventoryManagement.Repositories.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,9 @@ public class ProductService {
 
     private final CacheManager cacheManager;
 
-    private final KafkaTemplate<String, ProductActionDto> kafkaTemplate;
+    private final KafkaTemplate<String, ProductActionDto> kafkaProductTemplate;
+
+    private final KafkaTemplate<String, ProductsActionDto> kafkaProductListsTemplate;
 
     @Cacheable(value = "products", key = "#product.id")
     public Optional<Product> findById(Long id) {
@@ -50,7 +53,7 @@ public class ProductService {
     @CachePut(value = "products", key = "#product.id")
     public Product save(Product product) {
         productRepository.save(product);
-        kafkaTemplate.send("product_updated", new ProductActionDto(product.getId(), CREATE));
+        kafkaProductTemplate.send("product_updated", new ProductActionDto(product.getId(), CREATE));
         return product;
     }
 
@@ -77,6 +80,10 @@ public class ProductService {
         for (Product product : savedProducts) {
             cacheManager.getCache("products").put(product.getId(), product);
         }
+
+        List<Long> ids = savedProducts.stream().map(Product::getId).toList();
+
+        kafkaProductListsTemplate.send("products_list_updated", new ProductsActionDto(ids, CREATE));
 
         return savedProducts;
     }
