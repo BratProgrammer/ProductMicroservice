@@ -1,6 +1,6 @@
 package com.example.InventoryManagement.Services;
 
-import com.example.InventoryManagement.DTO.ProductActionDto;
+import com.example.InventoryManagement.DTO.Kafka.ProductActionDto;
 import com.example.InventoryManagement.Entities.Product;
 import com.example.InventoryManagement.Repositories.ProductRepository;
 import lombok.RequiredArgsConstructor;

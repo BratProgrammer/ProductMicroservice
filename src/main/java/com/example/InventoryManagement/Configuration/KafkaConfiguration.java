@@ -1,6 +1,6 @@
 package com.example.InventoryManagement.Configuration;
 
-import com.example.InventoryManagement.DTO.ProductActionDto;
+import com.example.InventoryManagement.DTO.Kafka.ProductActionDto;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;

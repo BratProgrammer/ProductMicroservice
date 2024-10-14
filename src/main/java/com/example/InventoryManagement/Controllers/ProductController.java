@@ -1,7 +1,7 @@
 package com.example.InventoryManagement.Controllers;
 
-import com.example.InventoryManagement.DTO.ProductDto;
-import com.example.InventoryManagement.DTO.ProductMapper;
+import com.example.InventoryManagement.DTO.Api.ProductDto;
+import com.example.InventoryManagement.DTO.Api.ProductMapper;
 import com.example.InventoryManagement.Entities.Product;
 import com.example.InventoryManagement.Services.ProductService;
 import com.fasterxml.jackson.databind.JsonNode;
