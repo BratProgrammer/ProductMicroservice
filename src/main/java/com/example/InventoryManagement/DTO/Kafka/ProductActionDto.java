@@ -2,9 +2,13 @@ package com.example.InventoryManagement.DTO.Kafka;
 
 import com.example.InventoryManagement.Enums.Action;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 
+import java.io.Serializable;
+
+@Data
 @AllArgsConstructor
-public class ProductActionDto {
+public class ProductActionDto implements Serializable {
     Long id;
     Action action;
 }

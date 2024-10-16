@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
     @Override
-    boolean existsById(Long aLong);
+    boolean existsById(Long id);
 }

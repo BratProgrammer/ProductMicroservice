@@ -2,7 +2,7 @@ package com.example.InventoryManagement.Configuration;
 
 import com.example.InventoryManagement.DTO.Kafka.ProductActionDto;
 import com.example.InventoryManagement.DTO.Kafka.ProductsActionDto;
-import com.fasterxml.jackson.databind.JsonSerializer;
+import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;

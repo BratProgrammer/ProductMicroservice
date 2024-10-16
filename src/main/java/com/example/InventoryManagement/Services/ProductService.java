@@ -34,7 +34,7 @@ public class ProductService {
 
     private final KafkaTemplate<String, ProductsActionDto> kafkaProductListsTemplate;
 
-    @Cacheable(value = "products", key = "#product.id")
+    @Cacheable(value = "products", key = "#id")
     public Optional<Product> findById(Long id) {
         return productRepository.findById(id);
     }
