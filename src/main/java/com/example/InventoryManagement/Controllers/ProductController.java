@@ -9,7 +9,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -33,10 +32,10 @@ public class ProductController {
     private final ProductService productService;
 
     @GetMapping
-    public Page<ProductDto> getPage(Pageable pageable) {
+    public Page<ProductDto> findAll(Pageable pageable) {
         Page<Product> products = productService.findAll(pageable);
-        PageImpl<ProductDto> productDtos = new PageImpl<>(products.stream().map(productMapper::toDto).toList(), pageable, products.getTotalElements());
-        return productDtos;
+        Page<ProductDto> productDtoPage = products.map(productMapper::toDto);
+        return productDtoPage;
     }
 
     @GetMapping("/all")
