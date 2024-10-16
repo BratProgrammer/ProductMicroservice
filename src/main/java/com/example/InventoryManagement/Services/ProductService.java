@@ -5,6 +5,7 @@ import com.example.InventoryManagement.DTO.Kafka.ProductsActionDto;
 import com.example.InventoryManagement.Entities.Product;
 import com.example.InventoryManagement.Repositories.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
@@ -15,9 +16,11 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static com.example.InventoryManagement.Enums.Action.CREATE;
+import static com.example.InventoryManagement.Enums.Action.DELETE;
 
 
 @RequiredArgsConstructor
@@ -65,11 +68,17 @@ public class ProductService {
 
     @CacheEvict(value = "products", key = "#product.id")
     public void delete(Product product) {
+        kafkaProductTemplate.send("product_updated", new ProductActionDto(product.getId(), DELETE));
         productRepository.delete(product);
     }
 
     @CacheEvict(value = "productsByIds", key = "#ids != null ? #ids.toString() : 'empty'")
     public void deleteAllById(List<Long> ids) {
+
+        for (Long id : ids) {
+            kafkaProductTemplate.send("product_updated", new ProductActionDto(id, DELETE));
+        }
+
         productRepository.deleteAllById(ids);
     }
 
@@ -78,7 +87,7 @@ public class ProductService {
         List<Product> savedProducts = productRepository.saveAll(products);
 
         for (Product product : savedProducts) {
-            cacheManager.getCache("products").put(product.getId(), product);
+            Objects.requireNonNull(cacheManager.getCache("products")).put(product.getId(), product);
         }
 
         List<Long> ids = savedProducts.stream().map(Product::getId).toList();

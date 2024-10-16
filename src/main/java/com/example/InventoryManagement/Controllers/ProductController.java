@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -32,8 +33,17 @@ public class ProductController {
     private final ProductService productService;
 
     @GetMapping
-    public Page<Product> getList(Pageable pageable) {
-        return productService.findAll(pageable);
+    public Page<ProductDto> getPage(Pageable pageable) {
+        Page<Product> products = productService.findAll(pageable);
+        PageImpl<ProductDto> productDtos = new PageImpl<>(products.stream().map(productMapper::toDto).toList(), pageable, products.getTotalElements());
+        return productDtos;
+    }
+
+    @GetMapping("/all")
+    public List<ProductDto> getList() {
+        return productService.findAll().stream()
+                .map(productMapper::toDto)
+                .toList();
     }
 
     @GetMapping("/{id}")
@@ -76,11 +86,12 @@ public class ProductController {
         }
 
         List<Product> resultProducts = productService.saveAll(products);
-        List<Long> ids1 = resultProducts.stream()
+        List<Long> list = resultProducts.stream()
                 .map(Product::getId)
                 .toList();
-        return ids1;
+        return list;
     }
+
 
     @DeleteMapping("/{id}")
     public Product delete(@PathVariable Long id) {
