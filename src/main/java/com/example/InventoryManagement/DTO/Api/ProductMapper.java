@@ -1,6 +1,5 @@
 package com.example.InventoryManagement.DTO.Api;
 
-import com.example.InventoryManagement.DTO.Api.ProductDto;
 import com.example.InventoryManagement.Entities.Product;
 import org.mapstruct.*;
 

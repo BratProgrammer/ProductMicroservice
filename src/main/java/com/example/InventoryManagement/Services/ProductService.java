@@ -5,7 +5,6 @@ import com.example.InventoryManagement.DTO.Kafka.ProductsActionDto;
 import com.example.InventoryManagement.Entities.Product;
 import com.example.InventoryManagement.Repositories.ProductRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
