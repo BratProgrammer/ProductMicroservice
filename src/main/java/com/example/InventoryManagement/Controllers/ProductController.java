@@ -80,8 +80,10 @@ public class ProductController {
     public List<Long> patchMany(@RequestParam List<Long> ids, @RequestBody JsonNode patchNode) throws IOException {
         Collection<Product> products = productService.findAllById(ids);
 
+        int updatePathIndex = 0;
         for (Product product : products) {
-            objectMapper.readerForUpdating(product).readValue(patchNode);
+            objectMapper.readerForUpdating(product).readValue(patchNode.get(updatePathIndex));
+            updatePathIndex++;
         }
 
         List<Product> resultProducts = productService.saveAll(products);
