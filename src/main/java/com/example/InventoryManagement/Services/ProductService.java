@@ -35,8 +35,9 @@ public class ProductService {
     private final KafkaTemplate<String, ProductsActionDto> kafkaProductListsTemplate;
 
     @Cacheable(value = "products", key = "#id")
-    public Optional<Product> findById(Long id) {
-        return productRepository.findById(id);
+    public Product findById(Long id) {
+        Product product = productRepository.findById(id).orElse(null);
+        return product;
     }
 
     public Page<Product> findAll(Pageable pageable) {
@@ -47,19 +48,19 @@ public class ProductService {
         return productRepository.findAll();
     }
 
-    @Cacheable(value = "productsByIds", key = "#ids != null ? #ids.toString() : 'empty'")
+    //@Cacheable(value = "productsByIds", key = "#ids != null ? #ids.toString() : 'empty'")
     public List<Product> findAllById(List<Long> ids) {
         return productRepository.findAllById(ids);
     }
 
-    @CachePut(value = "products", key = "#product.id")
+    @CachePut(value = "products", key = "#result.id")
     public Product save(Product product) {
         productRepository.save(product);
         kafkaProductTemplate.send("product_updated", new ProductActionDto(product.getId(), CREATE));
         return product;
     }
 
-    @CachePut(value = "products", key = "#product.id")
+    @CachePut(value = "products", key = "#result.id")
     public Product patch(Product product) {
         productRepository.save(product);
         return product;
@@ -71,7 +72,7 @@ public class ProductService {
         productRepository.delete(product);
     }
 
-    @CacheEvict(value = "productsByIds", key = "#ids != null ? #ids.toString() : 'empty'")
+    //@CacheEvict(value = "productsByIds", key = "#ids != null ? #ids.toString() : 'empty'")
     public void deleteAllById(List<Long> ids) {
 
         for (Long id : ids) {

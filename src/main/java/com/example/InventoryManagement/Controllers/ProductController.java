@@ -6,7 +6,6 @@ import com.example.InventoryManagement.Entities.Product;
 import com.example.InventoryManagement.Services.ProductService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,7 +16,6 @@ import org.springframework.web.server.ResponseStatusException;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping(value = "/rest/admin-ui/products")
@@ -45,14 +43,9 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public ProductDto getById(@PathVariable Long id) {
-        Optional<Product> productOptional = productService.findById(id);
-
-        if (productOptional.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Entity with id `%s` not found".formatted(id));
-        }
-
-        return productMapper.toDto(productOptional.get());
+    public ProductDto getById(@PathVariable("id") Long id) {
+        Product product = getProductById(id);
+        return productMapper.toDto(product);
     }
 
     @GetMapping("/by-ids")
@@ -61,14 +54,13 @@ public class ProductController {
     }
 
     @PostMapping
-    public ProductDto create(@RequestBody @Valid ProductDto productDto) {
+    public ProductDto create(@RequestBody ProductDto productDto) {
         return productMapper.toDto(productService.save(productMapper.toEntity(productDto)));
     }
 
     @PatchMapping(path = {"/{id}"})
-    public Product patch(@PathVariable Long id, @RequestBody JsonNode patchNode) throws IOException {
-        Product product = productService.findById(id).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Entity with id `%s` not found".formatted(id)));
+    public Product patch(@PathVariable("id") Long id, @RequestBody JsonNode patchNode) throws IOException {
+        Product product = getProductById(id);
 
         objectMapper.readerForUpdating(product).readValue(patchNode);
 
@@ -95,15 +87,22 @@ public class ProductController {
 
     @DeleteMapping("/{id}")
     public Product delete(@PathVariable Long id) {
-        Product product = productService.findById(id).orElse(null);
-        if (product != null) {
-            productService.delete(product);
-        }
+        Product product = getProductById(id);
+        productService.delete(product);
         return product;
     }
 
     @DeleteMapping
     public void deleteMany(@RequestParam List<Long> ids) {
         productService.deleteAllById(ids);
+    }
+
+
+    private Product getProductById(Long id) {
+        Product product = productService.findById(id);
+        if (product == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Entity with id `%s` not found".formatted(id));
+        }
+        return product;
     }
 }

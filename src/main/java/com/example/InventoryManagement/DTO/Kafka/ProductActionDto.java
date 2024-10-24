@@ -9,6 +9,6 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 public class ProductActionDto implements Serializable {
-    Long id;
-    Action action;
+    private Long id;
+    private Action action;
 }

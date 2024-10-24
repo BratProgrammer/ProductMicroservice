@@ -11,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ProductsActionDto implements Serializable {
 
-    List<Long> ids;
-    Action action;
+    private List<Long> ids;
+    private Action action;
 
 }
