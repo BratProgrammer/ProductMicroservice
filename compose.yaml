@@ -60,19 +60,6 @@ services:
       retries: 5
     networks:
       - inventory_manager
-  products_service:
-    image: inventory-management:latest
-    build: .
-    restart: "no"
-    ports:
-      - "8080:8080"
-    depends_on:
-      - redis
-      - kafka
-      - postgres
-      - keycloak
-    networks:
-      - inventory_manager
   kafka:
     image: confluentinc/cp-kafka:7.7.1
     restart: "no"
@@ -135,6 +122,25 @@ services:
       retries: 5
     networks:
       - inventory_manager
+  product_service:
+    image: inventory-management:latest
+    build:
+      context: .
+      args:
+        DOCKER_BUILDKIT: 1
+    restart: "no"
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - inventory_manager
+
 volumes:
   kafka_data:
   postgres_data:

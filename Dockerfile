@@ -1,24 +1,20 @@
-# Первый этап: сборка приложения
-FROM maven AS build
+FROM bellsoft/liberica-openjdk-debian:23.0.1 AS builder
+WORKDIR /application
+COPY . .
+RUN --mount=type=cache,target=/root/.m2  chmod +x mvnw && ./mvnw clean install -Dmaven.test.skip
 
-# Установите рабочую директорию
-WORKDIR /app
+FROM bellsoft/liberica-openjre-debian:23.0.1 AS layers
+WORKDIR /application
+COPY --from=builder /application/target/*.jar app.jar
+RUN java -Djarmode=layertools -jar app.jar extract
 
-# Копируйте файлы Maven
-COPY pom.xml ./
-COPY src ./src
+FROM bellsoft/liberica-openjre-debian:23.0.1
+VOLUME /tmp
+RUN useradd -ms /bin/bash spring-user
+USER spring-user
+COPY --from=layers /application/dependencies/ ./
+COPY --from=layers /application/spring-boot-loader/ ./
+COPY --from=layers /application/snapshot-dependencies/ ./
+COPY --from=layers /application/application/ ./
 
-# Сборка проекта
-RUN mvn clean package -DskipTests
-
-# Второй этап: создание минимального образа для запуска
-FROM openjdk:21-jdk-slim
-
-# Копируем собранный JAR-файл из первого этапа
-COPY --from=build /app/target/*.jar /app/
-
-# Открываем порт, который будет использовать приложение
-EXPOSE 8080
-
-# Запускаем приложение
-ENTRYPOINT ["java", "-jar", "/app/products_service.jar"]
+ENTRYPOINT ["java", "org.springframework.boot.loader.launch.JarLauncher"]

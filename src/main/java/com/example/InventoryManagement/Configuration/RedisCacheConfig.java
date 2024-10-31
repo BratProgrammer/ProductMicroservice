@@ -17,11 +17,11 @@ import java.time.Duration;
 
 @Configuration
 @EnableCaching
-public class RedisCacheConfig extends CachingConfigurerSupport {
+public class RedisCacheConfig {
 
     @Bean
-    public LettuceConnectionFactory redisConnectionFactory() {
-        return new LettuceConnectionFactory();
+    public LettuceConnectionFactory connectionFactory() {
+        return new LettuceConnectionFactory("redis", 6379);
     }
 
     @Bean
