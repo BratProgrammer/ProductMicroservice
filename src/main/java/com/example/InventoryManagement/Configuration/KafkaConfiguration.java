@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
 import java.util.Map;
@@ -17,16 +18,17 @@ import java.util.Map;
 public class KafkaConfiguration {
 
     @Bean
-    DefaultKafkaProducerFactory<String, ProductActionDto> idProducerFactory(KafkaProperties properties) {
+    ProducerFactory<String, ProductActionDto> producerFactory(KafkaProperties properties) {
         Map<String, Object> producerProperties = properties.buildProducerProperties(null);
         producerProperties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         producerProperties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+        producerProperties.put(ProducerConfig.ACKS_CONFIG, "all");
         return new DefaultKafkaProducerFactory<>(producerProperties);
     }
 
     @Bean
-    KafkaTemplate<String, ProductActionDto> idKafkaTemplate(DefaultKafkaProducerFactory<String, ProductActionDto> stringProducerFactory) {
-        return new KafkaTemplate<>(stringProducerFactory);
+    KafkaTemplate<String, ProductActionDto> kafkaTemplate(ProducerFactory<String, ProductActionDto> producerFactory) {
+        return new KafkaTemplate<>(producerFactory);
     }
 
 
