@@ -140,11 +140,42 @@ services:
         condition: service_healthy
     networks:
       - inventory_manager
+  redis_inventory:
+    image: redis:7.4.1
+    restart: "no"
+    ports:
+      - "6380:6379"
+    healthcheck:
+      test: redis-cli ping
+      interval: 10s
+      timeout: 5s
+      start_period: 10s
+      retries: 5
+  postgres_inventory:
+    image: postgres:17.0
+    restart: "no"
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_inventory_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres_secret
+      POSTGRES_DB: inventory_db
+    healthcheck:
+      test: pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB
+      interval: 10s
+      timeout: 5s
+      start_period: 10s
+      retries: 5
+    networks:
+      - inventory_manager
 
 volumes:
   kafka_data:
   postgres_data:
   pgadmin_data:
+  postgres_inventory_data:
 
 networks:
   inventory_manager:
